@@ -177,7 +177,12 @@
                                 // }
                                 // resultText += ") "
                             }
-                            resultText += currentCard[n] + "</div>"
+                            if(currentCard[n].Type != "Unit" && n == 2 || n == 3){
+                                resultText +=  "/  </div>"
+                            }
+                            else {
+                                resultText += currentCard[n] + "</div>"
+                            }
                         }
                         document.getElementById("results").innerHTML += textToHTML(resultText + "</div>");
                         return
