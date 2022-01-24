@@ -1,8 +1,0 @@
-{
-  "name": "Runeterdle",
-  "version": "1.0.0",
-  "dependencies": {},
-  "devDependencies": {
-    "papaparse": "^5.3.1"
-  }
-}
