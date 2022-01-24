@@ -3,21 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="css.css">
 </head>
 <body>
 
-<h1>HTML <code>datalist</code></h1>
-<ul class="tsummary">
-    <li>Blabla</li>
+<h1>Runterdle</h1>
 
-</ul>
-    <label for="myColor">Enter a color</label>
-    <input type="text" name="myColor" id="myColor" list="colorList">
-<datalist id="colorList">
-    <option>Golden Crushbot</option>
-    <option>Caustic Cask</option>
-    <option>Feral Prescience</option>
+<p id="answer"> </p>
+
+
+
+
+<p id="results">
+
+</p>
+
+
+
+<form autocomplete="off" id="cardForm">
+    <label for="card">Enter a card</label>
+    <input type="text" name="myCards" id="card" list="cardList">
+    <input type="submit" value="submit">
+</form>
+
+
+
+<datalist id="cardList">
+    <div id="options"></div>
 </datalist>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+
+<script>
+
+
+
+        let excelData = null
+        let cardAmount = 318
+
+        let answerName = ""
+
+
+
+        window.onload = function() {
+            tableText()
+        }
+
+        function tableText(){
+            var startText = ''
+            startText += '<div class="resultsboxbox">'
+            startText += '<div class="resultsbox"> Type</div>'
+            startText += '<div class="resultsbox"> Cost</div>'
+            startText += '<div class="resultsbox"> Attack</div>'
+            startText += '<div class="resultsbox"> Health</div>'
+            startText += '<div class="resultsbox">Region</div>'
+            startText += '<div class="resultsbox"> Set</div>'
+            startText += '<div class="resultsbox">Rarity</div>'
+            startText += '</div>'
+            document.getElementById("results").innerHTML += textToHTML(startText)
+        }
+
+        function init() {
+            Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vT7c2Fwr80Lp3IW5r8UGOOaJ4muyTSOrMDB2Ygr1TTHArHB54jKAts9skaPLafKWLJDfu3t-Calfzkq/pub?output=csv', {
+                    download: true,
+                    header: true,
+                    complete: showInfo
+                }
+            )
+        }
+
+        window.addEventListener('DOMContentLoaded', init)
+
+        function showInfo(results) {
+            console.log(results)
+            excelData = results.data
+
+            console.log(excelData)
+            console.log(excelData[0])
+            console.log(excelData[0].Name)
+
+            for(var i = 0; i < cardAmount; i++) {
+                console.log(excelData[i].Name)
+            }
+
+            var randomNumber = getRandomInt(cardAmount)
+            answerName = excelData[randomNumber].Name;
+            console.log(answerName)
+
+            var bigText = ''
+            for(var i = 0; i < cardAmount; i++){
+                bigText += '<option>' + excelData[i].Name + '</option>'
+            }
+
+            document.getElementById("options").innerHTML= textToHTML(bigText)
+        }
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+
+        var support = (function () {
+            if (!window.DOMParser) return false;
+            var parser = new DOMParser();
+            try {
+                parser.parseFromString('x', 'text/html');
+            } catch(err) {
+                return false;
+            }
+            return true;
+        })();
+
+        var textToHTML= function (str) {
+
+            // check for DOMParser support
+            if (support) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(str, 'text/html');
+                return doc.body.innerHTML;
+            }
+
+            // Otherwise, create div and append HTML
+            var dom = document.createElement('div');
+            dom.innerHTML = str;
+            return dom;
+
+        };
+
+        function isSame(){
+            if(document.getElementById('card').value == answerName){
+                return true
+            }
+            return false
+        }
+
+        function printThings(){
+            if(isSame()){
+                document.getElementById("results").innerHTML += "YOU WIN!!!";
+            }
+            else {
+                var answerIndex = 0
+                for (var i = 0; i < cardAmount; i++) {
+                    if (answerName == excelData[i].Name) {
+                        answerIndex = i
+                    }
+                }
+
+                for (var i = 0; i < cardAmount; i++) {
+                    if (document.getElementById('card').value == excelData[i].Name) {
+
+                        var currentCard = [excelData[i].Type, excelData[i].Cost, excelData[i].Attack, excelData[i].Health, excelData[i].Region, excelData[i].Set, excelData[i].Rarity]
+                        var answerCard = [excelData[answerIndex].Type, excelData[answerIndex].Cost, excelData[answerIndex].Attack, excelData[answerIndex].Health, excelData[answerIndex].Region, excelData[answerIndex].Set, excelData[answerIndex].Rarity]
+
+                        var resultText = '<div class="resultsboxbox">'
+                        var attributes = 7
+
+                        for (var n = 0; n < attributes; n++) {
+                            resultText += '<div class="resultsbox '
+                            if(answerCard[n] == currentCard[n]){
+                                resultText += ' goodAnswer"> '
+                            }
+                            else{
+                                resultText += ' badAnswer">'
+                                // if (n == 1 || n == 2 || n == 3){
+                                //     if(currentCard[n] > answerCard[n]){
+                                //         resultText += ", Too large"
+                                //     }
+                                //     else{
+                                //         resultText += ", Too small"
+                                //     }
+                                // }
+                                // resultText += ") "
+                            }
+                            resultText += currentCard[n] + "</div>"
+                        }
+                        document.getElementById("results").innerHTML += textToHTML(resultText + "</div>");
+                        return
+                    }
+                }
+                document.getElementById("results").innerHTML += textToHTML("<p> Nothing found </p>");
+            }
+        }
+
+        $(document).ready(function() {
+            $(document).on('submit', '#cardForm', function() {
+                printThings()
+
+                return false;
+            });
+        });
+
+
+
+</script>
 
 </body>
 </html>

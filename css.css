@@ -1,0 +1,35 @@
+body {
+    background-color: #121213;
+}
+
+p, h1, form{
+    color: white;
+    text-align: center;
+    font-size: 30px;
+}
+
+.resultsboxbox {
+ 
+    height: 70px;
+    overflow: hidden;
+
+    /*border: 1px solid red;*/
+
+}
+
+.resultsbox {
+    width:150px;
+    display: inline-block;
+    vertical-align: top;
+
+    /*border: 1px red solid;*/
+}
+
+.goodAnswer {
+    color: green;
+}
+
+.badAnswer {
+    color: red;
+}
+
